@@ -1,0 +1,124 @@
+<!--Input-->
+<div class="w-full py-3 px-2 max-w-[1920px] mx-auto]  ">
+    <section class="flex flex-column flex-wrap lg:flex-row gap-1 w-full justify-center ">
+        <input type="text" class="w-full lg:w-[400px] rounded-sm outline-black border-2 border-red-300 py-2 px-3"
+            placeholder="search" [(ngModel)]="text" (ngModelChange)="handleInput($event)" />
+        <button class="w-full lg:w-20 py-2 px-3 bg-red-500 text-white font-medium rounded-md"
+            (click)="searchPokemon()">Buscar</button>
+
+    </section>
+    <div class="relative py-3 px-3 my-3 w-full flex justify-center  mx-w-[1920px]">
+        <section *ngIf="containListName && text !=='' && autoCompleteName.length !==0 "
+            class="flex flex-column flex-wrap gap-5 text-white  absolute z-50 bg-gray-800 h-[250px] overflow-auto w-full lg:w-[500px] top-0 rounded-lg px-3">
+            <span *ngFor="let pokemon of autoCompleteName" (click)="getName($event)"
+                class="w-full cursor-pointer text-base h-[45px] py-2 px-1 transition-all lg:hover:bg-gray-700 rounded-md text-center">{{pokemon.name}}</span>
+        </section>
+    </div>
+
+</div>
+
+<!--Tabla de pokemones-->
+
+<main class=" h-[520px] lg:h-[650px] lg:py-3 lg:gap-3 max-w-[1920px]  lg:flex lg:justify-center lg:items-center lg:px-3 w-full ">
+    <section class="w-full lg:w-2/4 h-[90%] flex flex-col lg:py-3 items-center justify-start  text-white">
+
+        <table class="w-full lg:mx-auto h-auto border-separate border-spacing-1">
+            <thead class="py-5 px-3 font-bold text-base bg-gray-800 text-center ">
+                <tr class="rounded-md">
+                    <th class="py-3">Id</th>
+                    <th class="py-3 ">Name</th>
+                    <th class="py-3 ">Image</th>
+                </tr>
+            </thead>
+            <tbody class="text-center transition-all">
+                <tr class="lg:hover:scale-105 duration-300 "
+                    *ngFor="let pokemon of pokemonDetails | paginate:page:search ">
+                    <td class="py-2 bg-gray-700 my-4 ">{{pokemon.id}}</td>
+                    <td (click)="getDetailPokemon($event)" class="cursor-pointer   py-2 bg-gray-700 my-4">
+                        {{pokemon.name}}</td>
+                    <td class="py-2 bg-gray-700 my-4"><img class="mx-auto w-[70px] lg:w-[80px] " [src]="pokemon.image"
+                            [alt]="pokemon.name"></td>
+                </tr>
+            </tbody>
+        </table>
+
+    </section>
+
+    <!--Card de info de pokemones-->
+    <section *ngIf="showCardInfo"
+        class=" w-full lg:static h-screen fixed top-0 bottom-0 lg:w-2/4 lg:h-full lg:flex lg:items-center overflow-hidden text-white lg:justify-center lg:gap-5">
+        <div class="flex-none lg:w-[500px] h-full  lg:h-[630px] bg-gray-800 lg:rounded-2xl ">
+            <div class="lg:hidden text-white text-right px-3 py-3">
+                <i (click)="handleShowCard()" class='bx bx-x text-2xl'></i>
+            </div>
+            <div *ngIf="pokemonInfo.length === 0">
+                <img src="../../../assets/pokeball.png" alt="pokeball_image">
+            </div>
+            <article *ngFor="let pokemon of pokemonInfo" class="h-full">
+                <figure class="w-full flex justify-center">
+                    <img class="w-[200px]" [src]="pokemon.sprites.front_default" [alt]="pokemon.name">
+                </figure>
+                <hr>
+                <div class="text-center">
+                    <h2 class="text-center text-2xl font-semibold">Type</h2>
+                    <ul class="flex justify-center gap-4">
+                        <li *ngFor="let types of pokemon.types" class="font-medium  text-gray-400"> {{types.type.name}}
+                        </li>
+                    </ul>
+                </div>
+                <div class="flex gap-4   justify-evenly my-5 px-3">
+                    <article class="text-center w-[150px]">
+                        <h3 class="font-semibold text-xl">Abilities:</h3>
+                        <ul>
+                            <li class="font-normal  text-gray-400" *ngFor="let abilitie of pokemon.abilities">
+                                {{abilitie.ability.name}}</li>
+                        </ul>
+                    </article>
+                    <article class="text-center  w-[150px]">
+                        <h3 class="font-semibold text-xl">weight:</h3>
+                        <ul>
+                            <li class="font-normal text-gray-400">{{pokemon.weight}}</li>
+                        </ul>
+                    </article>
+                    <article class="text-center  w-[150px]">
+                        <h3 class="font-semibold text-xl">height:</h3>
+                        <ul>
+                            <li class="font-normal  text-gray-400"> {{pokemon.height}} </li>
+                        </ul>
+                    </article>
+                </div>
+                <div class="flex my-5 gap-4 justify-evenly flex-wrap">
+                    <article class="w-[150px] text-center" *ngFor="let stat of pokemon.stats">
+                        <h3 class="font-semibold text-xl ">{{stat.stat.name}}:</h3>
+                        <ul>
+                            <li class="font-normal  text-gray-400">{{stat.base_stat}}</li>
+                        </ul>
+                    </article>
+                </div>
+            </article>
+        </div>
+    </section>
+</main>
+
+<!--Botones de paginación-->
+
+<div class="w-full lg:w-full flex gap-4 justify-center max-w-[1920px] items-center my-7">
+    <button (click)="previousPage()" [disabled]="(pokemonDetails | paginate:page:search).length === 0"
+        class="text-white w-10 aspect-square bg-red-500 rounded-lg"><i class='bx bx-left-arrow-alt'></i></button>
+    <button (click)="nextPage()" [disabled]="(pokemonDetails | paginate:page:search).length === 0"
+        class="text-white w-10 aspect-square bg-red-500 rounded-lg"><i class='bx bx-right-arrow-alt'></i></button>
+</div>
+
+<!--Conteo de pokemones-->
+
+<h2 class="text-white text-center font-bold text-3xl">Pokemones que inician con cada letra del abecedario</h2>
+
+<div class="mx-auto text-white flex gap-5 flex-wrap my-7 px-4 justify-center w-full max-w-[1366px]">
+
+    <article class="w-[60px] aspect-square rounded-full bg-gray-700 text-center" *ngFor="let key of Object.keys(obj)">
+        <span class="text-xl font-medium">{{key}}</span>
+        <p class="text-gray-400">{{obj[key]}}</p>
+    </article>
+
+    <!--<p> {{key}}: {{obj[key]}}</p>-->
+</div>
